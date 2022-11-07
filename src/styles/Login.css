@@ -1,0 +1,7 @@
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(173, 208, 209);
+    opacity: 0.7;
+}

@@ -1,47 +1,58 @@
-import { BrowserRouter as Router, Link, Route, Routes } from "react-router-dom";
-import "./App.css";
+import React, { useEffect, useState } from 'react';
+import './styles/App.scss';
+import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
+import Dashboard from './components/DashBoard';
+import Login from './components/Login';
+import TasksList from './components/TaskList';
+import useToken from './components/useToken';
+import Button from './components/Button';
+import Navbar from './components/NavBar';
 
-// Components
-import { signOut } from "firebase/auth";
-import React, { useState } from "react";
-import Button from "./components/Button";
-import CreatePost from "./components/CreatePost";
-import Home from "./components/Home";
-import Login from "./components/Login";
-import { auth } from "./firebase-config";
 
 function App() {
-  const [isAuth, setIsAuth] = useState(false);
 
-  const signUserOut = () => {
-    signOut(auth).then(() => {
-      localStorage.clear();
-      setIsAuth(false);
-      window.location.path = "/login";
-    });
-  }
+  const [loading, setloading] = useState(true);
+  const { token, setToken } = useToken();
+
+  useEffect(() => {
+    setTimeout(() => {
+      setloading(false);
+    }, 2500);
+  }, [])
 
   return (
-    <Router>
-      <nav>
-        <Link to="/">Home</Link>
-        {!isAuth ? (
-          <Link to="/login">Login</Link>
-        ) : (
-          <>
-            <Link to="/createpost">Create-Post</Link>
-            <Button onClick={signUserOut} color='darkgray' text='Sign Out' />
-          </>
-        )}
-      </nav>
-      <Routes>
-        <Route path="/" element={<Home isAuth={isAuth} />} />
-        <Route path="/createpost" element={<CreatePost isAuth={isAuth} />} />
-        <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
-      </Routes>
-    </Router>
-
+    <>
+      {
+        loading ?
+          <div className="spinnerContainer">
+            <div className="spinner-grow text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <div className="spinner-grow text-secondary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <div className="spinner-grow text-success" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <div className="spinner-grow text-danger" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <div className="spinner-grow text-warning" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div> :
+          <div className="container">
+            <BrowserRouter>
+              {token ? <Navbar /> : <></>}
+              <Routes>
+                <Route exact path="/" element={<Login setToken={setToken} />} />
+                <Route exact path="/tasklist" element={<TasksList token={token} />} />
+                <Route exact path="/dashboard" element={<Dashboard />} />
+              </Routes>
+            </BrowserRouter>
+          </div>
+      }
+    </>
   );
 }
-
 export default App;
